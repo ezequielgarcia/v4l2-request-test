@@ -214,6 +214,7 @@ static int discover_properties(int drm_fd, int connector_id, int crtc_id,
 		uint32_t object_id;
 		char *name;
 		uint32_t *value;
+		bool optional;
 	} glue[] = {
 		{ DRM_MODE_OBJECT_CONNECTOR, connector_id, "CRTC_ID", &ids->connector_crtc_id },
 		{ DRM_MODE_OBJECT_CRTC, crtc_id, "MODE_ID", &ids->crtc_mode_id },
@@ -228,7 +229,7 @@ static int discover_properties(int drm_fd, int connector_id, int crtc_id,
 		{ DRM_MODE_OBJECT_PLANE, plane_id, "CRTC_Y", &ids->plane_crtc_y },
 		{ DRM_MODE_OBJECT_PLANE, plane_id, "CRTC_W", &ids->plane_crtc_w },
 		{ DRM_MODE_OBJECT_PLANE, plane_id, "CRTC_H", &ids->plane_crtc_h },
-		{ DRM_MODE_OBJECT_PLANE, plane_id, "zpos", &ids->plane_zpos },
+		{ DRM_MODE_OBJECT_PLANE, plane_id, "zpos", &ids->plane_zpos, true },
 	};
 	unsigned int i, j;
 	int rc;
@@ -264,7 +265,8 @@ static int discover_properties(int drm_fd, int connector_id, int crtc_id,
 		if (j == properties->count_props) {
 			fprintf(stderr, "Unable to find property for %s\n",
 				glue[i].name);
-			goto error;
+			if (!glue[i].optional)
+				goto error;
 		}
 
 		drmModeFreeProperty(property);
