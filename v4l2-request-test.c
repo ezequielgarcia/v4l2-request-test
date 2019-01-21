@@ -42,7 +42,6 @@ struct format_description formats[] = {
 		.description		= "NV12 YUV",
 		.v4l2_format		= V4L2_PIX_FMT_NV12,
 		.v4l2_buffers_count	= 1,
-		.v4l2_mplane		= false,
 		.drm_format		= DRM_FORMAT_NV12,
 		.drm_modifier		= DRM_FORMAT_MOD_NONE,
 		.planes_count		= 2,
@@ -53,7 +52,6 @@ struct format_description formats[] = {
 		.description		= "Sunxi Tiled NV12 YUV",
 		.v4l2_format		= V4L2_PIX_FMT_SUNXI_TILED_NV12,
 		.v4l2_buffers_count	= 1,
-		.v4l2_mplane		= false,
 		.drm_format		= DRM_FORMAT_NV12,
 		.drm_modifier		= DRM_FORMAT_MOD_ALLWINNER_TILED,
 		.planes_count		= 2,
@@ -250,7 +248,7 @@ int main(int argc, char *argv[])
 	int media_fd = -1;
 	int drm_fd = -1;
 	uint64_t ts;
-	bool test;
+	bool v4l2_mplane, test;
 	int opt;
 	int rc;
 
@@ -357,7 +355,25 @@ int main(int argc, char *argv[])
 		goto error;
 	}
 
+	test = video_engine_capabilities_test(video_fd,
+					      V4L2_CAP_VIDEO_M2M_MPLANE);
+	if (test) {
+		v4l2_mplane = true;
+		printf("Driver supports multi-planar API\n");
+	} else  {
+		test = video_engine_capabilities_test(video_fd,
+						      V4L2_CAP_VIDEO_M2M);
+		v4l2_mplane = false;
+		printf("Driver supports single-planar API\n");
+	}
+
+	if (!test) {
+		fprintf(stderr, "Missing required driver M2M capability\n");
+		goto error;
+	}
+
 	for (i = 0; i < ARRAY_SIZE(formats); i++) {
+		formats[i].v4l2_mplane = v4l2_mplane;
 		test = video_engine_format_test(video_fd,
 						formats[i].v4l2_mplane, width,
 						height, formats[i].v4l2_format);
@@ -378,18 +394,6 @@ int main(int argc, char *argv[])
 	test = video_engine_capabilities_test(video_fd, V4L2_CAP_STREAMING);
 	if (!test) {
 		fprintf(stderr, "Missing required driver streaming capability\n");
-		goto error;
-	}
-
-	if (selected_format->v4l2_mplane)
-		test = video_engine_capabilities_test(video_fd,
-						      V4L2_CAP_VIDEO_M2M_MPLANE);
-	else
-		test = video_engine_capabilities_test(video_fd,
-						      V4L2_CAP_VIDEO_M2M);
-
-	if (!test) {
-		fprintf(stderr, "Missing required driver M2M capability\n");
 		goto error;
 	}
 
