@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+
 #include <errno.h>
 #include <fcntl.h>
 #include <stdbool.h>
@@ -29,7 +31,6 @@
 #include <unistd.h>
 
 #include <drm_fourcc.h>
-#include <sun4i_drm.h>
 #include <xf86drm.h>
 #include <xf86drmMode.h>
 
