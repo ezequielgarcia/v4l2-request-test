@@ -631,9 +631,6 @@ static int select_plane(int drm_fd, unsigned int crtc_id, unsigned int format,
 		if (type == DRM_PLANE_TYPE_PRIMARY)
 			zpos_primary = zpos_value;
 
-		if (type != DRM_PLANE_TYPE_OVERLAY)
-			continue;
-
 		format_found = false;
 
 		for (j = 0; j < plane->count_formats; j++)
