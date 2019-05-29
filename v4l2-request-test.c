@@ -137,13 +137,14 @@ static void print_time_diff(struct timespec *before, struct timespec *after,
 	printf("%s time: %ld us\n", prefix, diff);
 }
 
-static int load_data(const char *path, void **data, unsigned int *size)
+static int load_data(const char *path, void **data, unsigned int *size, int type)
 {
-	void *buffer = NULL;
+	char *buffer = NULL;
 	unsigned int length;
 	struct stat st;
 	int fd;
 	int rc;
+	int off = 0;
 
 	rc = stat(path, &st);
 	if (rc < 0) {
@@ -153,7 +154,10 @@ static int load_data(const char *path, void **data, unsigned int *size)
 
 	length = st.st_size;
 
-	buffer = malloc(length);
+	if (type == CODEC_TYPE_H264)
+		off = 3;
+
+	buffer = malloc(length + off);
 
 	fd = open(path, O_RDONLY);
 	if (fd < 0) {
@@ -162,7 +166,7 @@ static int load_data(const char *path, void **data, unsigned int *size)
 		goto error;
 	}
 
-	rc = read(fd, buffer, length);
+	rc = read(fd, buffer + off, length);
 	if (rc < 0) {
 		fprintf(stderr, "Unable to read file data: %s\n",
 			strerror(errno));
@@ -172,7 +176,13 @@ static int load_data(const char *path, void **data, unsigned int *size)
 	close(fd);
 
 	*data = buffer;
-	*size = length;
+	*size = length + 3;
+
+	if (type == CODEC_TYPE_H264) {
+		buffer[0] = 0;
+		buffer[1] = 0;
+		buffer[2] = 1;
+	}
 
 	rc = 0;
 	goto complete;
@@ -466,7 +476,7 @@ int main(int argc, char *argv[])
 		free(slice_filename);
 		slice_filename = NULL;
 
-		rc = load_data(slice_path, &slice_data, &slice_size);
+		rc = load_data(slice_path, &slice_data, &slice_size, preset->type);
 		if (rc < 0) {
 			fprintf(stderr, "Unable to load slice data\n");
 			goto error;
