@@ -22,7 +22,7 @@
 
 #include <linux/types.h>
 #include <linux/v4l2-controls.h>
-#include <linux/videodev2.h>
+#include "videodev2.h"
 #include <h264-ctrls.h>
 #include <mpeg2-ctrls.h>
 

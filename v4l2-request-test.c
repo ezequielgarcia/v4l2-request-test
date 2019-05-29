@@ -16,6 +16,10 @@
  */
 
 #define _GNU_SOURCE
+
+#include "videodev2.h"
+#include "media.h"
+
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
@@ -30,8 +34,6 @@
 #include <unistd.h>
 
 #include <drm_fourcc.h>
-#include <linux/media.h>
-#include <linux/videodev2.h>
 #include <mpeg2-ctrls.h>
 #include <xf86drm.h>
 

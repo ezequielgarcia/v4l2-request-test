@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "videodev2.h"
+#include "media.h"
+
 #include <errno.h>
 #include <fcntl.h>
 #include <stdbool.h>
@@ -27,8 +30,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <linux/media.h>
-#include <linux/videodev2.h>
 #include <mpeg2-ctrls.h>
 
 #include "v4l2-request-test.h"

@@ -21,7 +21,7 @@
 #include <unistd.h>
 
 #include <linux/media.h>
-#include <linux/videodev2.h>
+#include "videodev2.h"
 #include <mpeg2-ctrls.h>
 
 #include "v4l2-request-test.h"
